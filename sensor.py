@@ -51,7 +51,7 @@ STORE = None
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     from dexcomapi import DexcomSession
-    asyncio.set_event_loop(LOOP)
+    #asyncio.set_event_loop(LOOP)
     try:
         client_id = config.get(CONF_CLIENT_ID)
         client_secret = config.get(CONF_CLIENT_SECRET)
@@ -59,7 +59,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
         # Get storage to see if we have a newer refresh token.
         STORE = get_store(hass, 1)
-        token_data = asyncio.run_coroutine_threadsafe(STORE.async_load(), hass.loop).result()
+        token_data = await STORE.async_load()
         if token_data is not None and "refresh_token" in token_data:
             refresh = token_data["refresh_token"]
 
