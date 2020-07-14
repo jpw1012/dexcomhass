@@ -112,7 +112,7 @@ class BGSensor(Entity):
         """Update device state."""
         _LOGGER.info("Updating Dexcom")
         try:
-            bg = await self._session.loadCurrentBG()
+            bg = await self._session.load_current_bg()
             if bg is None:
                 self._state = "loading"
                 return
