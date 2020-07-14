@@ -59,7 +59,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
         # Get storage to see if we have a newer refresh token.
         STORE = get_store(hass, 1)
-        token_data = await STORE.async_load()
+        token_data = asyncio.run_coroutine_threadsafe(STORE.async_load(), hass.loop).result()
         if token_data is not None and "refresh_token" in token_data:
             refresh = token_data["refresh_token"]
 
