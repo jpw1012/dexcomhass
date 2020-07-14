@@ -119,7 +119,7 @@ class BGSensor(Entity):
 
     def try_update(self):
         try:
-            bg = self._session.load_current_bg()
+            bg = await self.hass.async_add_executor_job(self._session.load_current_bg())
             self._attributes = {ATTR_ATTRIBUTION: DOMAIN}
             self._attributes.update(bg)
             self._state = bg["smoothedValue"]
