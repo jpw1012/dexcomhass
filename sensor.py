@@ -45,21 +45,17 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     }
 )
 
-LOOP = asyncio.new_event_loop()
-STORE = None
-
-
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     from dexcomapi import DexcomSession
-    #asyncio.set_event_loop(LOOP)
+
     try:
         client_id = config.get(CONF_CLIENT_ID)
         client_secret = config.get(CONF_CLIENT_SECRET)
         refresh = config.get(CONF_TOKEN)
 
         # Get storage to see if we have a newer refresh token.
-        STORE = get_store(hass, 1)
-        token_data = await STORE.async_load()
+        store = get_store(hass, 1)
+        token_data = await store.async_load()
         if token_data is not None and "refresh_token" in token_data:
             refresh = token_data["refresh_token"]
 
@@ -76,6 +72,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         [
             BGSensor(
                 _session,
+                store,
                 config.get(CONF_SCAN_INTERVAL, SCAN_INTERVAL)
             )
         ],
@@ -88,18 +85,19 @@ def get_store(hass, version):
     return store
 
 
-async def save_token(token):
-    await STORE.async_save(token)
+async def save_token(store, token):
+    await store.async_save(token)
 
 
 class BGSensor(Entity):
     """Blood Glucose Sensor."""
 
-    def __init__(self, session, interval):
+    def __init__(self, session, store, interval):
         """Initialize the sensor."""
         self._session = session
         self._attributes = None
         self._state = None
+        self._store = store
         self.async_update = Throttle(interval)(self._update)
 
     @property
@@ -146,7 +144,7 @@ class BGSensor(Entity):
                 do_retry = True
                 retry_count += 1
                 res = self._session.load_session()
-                self.hass.async_create_task(save_token(res))
+                self.hass.async_create_task(save_token(self._store, res))
             except Exception as e:
                 raise e
 
