@@ -48,7 +48,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 LOOP = asyncio.new_event_loop()
 
 
-def setup_platform(hass, config, add_entities, discovery_info=None):
+async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     from dexcomapi import DexcomSession
     asyncio.set_event_loop(LOOP)
     try:
@@ -56,17 +56,22 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
         client_secret = config.get(CONF_CLIENT_SECRET)
         refresh = config.get(CONF_TOKEN)
 
-        url = get_url(hass, require_ssl=True, allow_internal=False)
+        #Get storage to see if we have a newer refresh token. Store is also used by api to save new tokens
         store = get_store(hass, 1)
+        token_data = await store.async_load()
+        if token_data is not None and "refresh_token" in token_data:
+            refresh = token_data["refresh_token"]
+
+        url = get_url(hass, require_ssl=True, allow_internal=False)
         _LOGGER.info("Starting Dexcom session")
         _session = DexcomSession(store, url, client_id, client_secret, refresh)
-
+        # first try to load tokens from storage
 
     except:
         _LOGGER.exception("Could not connect to Dexcom")
         return False
 
-    add_entities(
+    async_add_entities(
         [
             BGSensor(
                 _session,
@@ -112,7 +117,7 @@ class BGSensor(Entity):
         """Update device state."""
         _LOGGER.info("Updating Dexcom")
         try:
-            bg = await self._session.load_current_bg()
+            bg = self._session.load_current_bg()
             if bg is None:
                 self._state = "loading"
                 return
