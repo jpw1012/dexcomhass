@@ -49,7 +49,7 @@ LOOP = asyncio.new_event_loop()
 
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
-    import dexcomapi
+    from dexcomapi import DexcomSession
     asyncio.set_event_loop(LOOP)
     try:
         client_id = config.get(CONF_CLIENT_ID)
@@ -108,7 +108,7 @@ class BGSensor(Entity):
         return "mg/dl"
 
     async def _update(self):
-        import dexcomapi
+        from dexcomapi import DexcomSession
         """Update device state."""
         _LOGGER.info("Updating Dexcom")
         try:
