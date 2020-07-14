@@ -1,0 +1,10 @@
+{
+    "domain": "dexcom",
+    "name": "Dexcom",
+    "documentation": "https://pypi.org/project/dexcomapi/",
+    "requirements": [
+      "dexcomapi==0.1.0"
+    ],
+    "dependencies": [],
+    "codeowners": []
+}
