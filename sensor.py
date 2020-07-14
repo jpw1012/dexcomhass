@@ -77,7 +77,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     )
 
 
-def get_store(self, hass, version):
+def get_store(hass, version):
     store = Store(hass, version, STOREKEY, encoder=JSONEncoder, private=True)
     return store
 
