@@ -29,7 +29,6 @@ _LOGGER = logging.getLogger(__name__)
 
 DOMAIN = "dexcom"
 URLROOT = "sandbox-api.dexcom.com"
-# COOKIE = "upsmychoice_cookies.pickle"
 ICON = "mdi:spoon-sugar"
 STOREKEY = "dexcom"
 
@@ -143,7 +142,7 @@ class BGSensor(Entity):
                 _LOGGER.error("Session expired so refresh and retry")
                 do_retry = True
                 retry_count += 1
-                res = self._session.load_session()
+                res = await self.hass.async_add_executor_job(self._session.load_session())
                 self.hass.async_create_task(save_token(self._store, res))
             except Exception as e:
                 raise e
