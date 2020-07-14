@@ -46,6 +46,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 )
 
 LOOP = asyncio.new_event_loop()
+STORE = None
 
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
@@ -56,15 +57,15 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         client_secret = config.get(CONF_CLIENT_SECRET)
         refresh = config.get(CONF_TOKEN)
 
-        #Get storage to see if we have a newer refresh token. Store is also used by api to save new tokens
-        store = get_store(hass, 1)
-        token_data = await store.async_load()
+        # Get storage to see if we have a newer refresh token.
+        STORE = get_store(hass, 1)
+        token_data = await STORE.async_load()
         if token_data is not None and "refresh_token" in token_data:
             refresh = token_data["refresh_token"]
 
         url = get_url(hass, require_ssl=True, allow_internal=False)
         _LOGGER.info("Starting Dexcom session")
-        _session = DexcomSession(store, url, client_id, client_secret, refresh)
+        _session = DexcomSession(url, client_id, client_secret, refresh)
         # first try to load tokens from storage
 
     except:
@@ -85,6 +86,10 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 def get_store(hass, version):
     store = Store(hass, version, STOREKEY, encoder=JSONEncoder, private=True)
     return store
+
+
+async def save_token(token):
+    await STORE.async_save(token)
 
 
 class BGSensor(Entity):
@@ -112,24 +117,38 @@ class BGSensor(Entity):
         """Return the unit of measurement of this entity, if any."""
         return "mg/dl"
 
-    async def _update(self):
-        from dexcomapi import DexcomSession
-        """Update device state."""
-        _LOGGER.info("Updating Dexcom")
+    def try_update(self):
         try:
             bg = self._session.load_current_bg()
-            if bg is None:
-                self._state = "loading"
-                return
-
             self._attributes = {ATTR_ATTRIBUTION: DOMAIN}
             self._attributes.update(bg)
             self._state = bg["smoothedValue"]
+            return True
         except Exception as e:
-            _LOGGER.error("Error fetching data")
+            _LOGGER.error("Error updating data")
             _LOGGER.error(e)
-            self._state = "Error"
             raise e
+
+    async def _update(self):
+        from dexcomapi import DexcomSession, ExpiredSessionException
+        """Update device state."""
+        _LOGGER.info("Updating Dexcom")
+        retry_count = 0
+        do_retry = True
+
+        while do_retry and retry_count < 3:  # MaxRetry = 3
+            try:
+                do_retry = False
+                res = self.try_update()
+            except ExpiredSessionException as ex:
+                # Reload session and persist new token
+                _LOGGER.error("Session expired so refresh and retry")
+                do_retry = True
+                retry_count += 1
+                res = self._session.load_session()
+                self.hass.async_create_task(save_token(res))
+            except Exception as e:
+                raise e
 
     @property
     def device_state_attributes(self):
