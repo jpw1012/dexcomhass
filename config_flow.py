@@ -3,7 +3,7 @@ from homeassistant import config_entries
 # from .const import DOMAIN
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
-from const import DOMAIN, URL_ROOT
+from .const import DOMAIN, URL_ROOT
 from homeassistant.const import (
     ATTR_ATTRIBUTION,
     ATTR_DATE,
