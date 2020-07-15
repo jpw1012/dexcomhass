@@ -138,7 +138,7 @@ class BGSensor(Entity):
                 res = await self.try_update()
             except ExpiredSessionException as ex:
                 # Reload session and persist new token
-                _LOGGER.info("Session expired so refresh and retry: {}".format(self._session))
+                _LOGGER.info("Session expired so refresh and retry")
                 do_retry = True
                 retry_count += 1
                 res = await self.hass.async_add_executor_job(self._session.load_session)
