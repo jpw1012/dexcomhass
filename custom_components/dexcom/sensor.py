@@ -1,11 +1,8 @@
 """Sensor for Dexcom packages."""
 import logging
-import json
 from json import JSONEncoder
-from datetime import datetime, timedelta
-from .const import DOMAIN, URL_ROOT
-from collections import defaultdict
-import asyncio
+from datetime import timedelta
+from custom_components.dexcom.const import DOMAIN
 
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
@@ -20,12 +17,9 @@ from homeassistant.const import (
     CONF_FRIENDLY_NAME
 )
 from homeassistant.helpers.entity import Entity
-from homeassistant.util import Throttle, slugify
+from homeassistant.util import Throttle
 from homeassistant.helpers.network import get_url
 from homeassistant.helpers.storage import Store
-
-import http.client
-import mimetypes
 
 _LOGGER = logging.getLogger(__name__)
 ICON = "mdi:spoon-sugar"
