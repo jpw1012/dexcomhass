@@ -30,7 +30,7 @@ class DexcomConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return await self.async_step_authorize()
 
         return self.async_show_form(
-            step_id="authorize", data_schema=vol.Schema(
+            step_id="user", data_schema=vol.Schema(
                 {
                     vol.Required("friendly_name"): str,
                     vol.Required(CONF_CLIENT_ID): str,
