@@ -2,7 +2,6 @@
 import logging
 from json import JSONEncoder
 from datetime import timedelta
-from custom_components.dexcom.const import DOMAIN
 
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
@@ -28,6 +27,8 @@ STOREKEY = "dexcom"
 DATEFORMAT = "%Y-%m-%dT%H:%M:%S"
 
 SCAN_INTERVAL = timedelta(seconds=300)
+
+DOMAIN = "dexcom"
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
