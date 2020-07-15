@@ -19,9 +19,12 @@ URL_ROOT = "sandbox-api.dexcom.com"
 
 _LOGGER = logging.getLogger(DOMAIN)
 
-class ExampleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+
+class DexcomConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    VERSION = 1
 
     async def async_step_user(self, info):
+        _LOGGER.info("Starting init step")
         if info is not None:
             self.init_info = info
             return await self.async_step_authorize()
@@ -36,7 +39,7 @@ class ExampleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             )
         )
 
-    async def async_step_authorize(self, user_input = None):
+    async def async_step_authorize(self, user_input=None):
         if user_input is None:
             info = self.init_info
             return self.async_external_step(
