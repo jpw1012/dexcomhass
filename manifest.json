@@ -3,7 +3,7 @@
     "name": "Dexcom",
     "documentation": "https://pypi.org/project/dexcomapi/",
     "requirements": [
-      "dexcomapi==0.2.6"
+      "dexcomapi==0.3.0"
     ],
     "dependencies": [],
     "codeowners": []

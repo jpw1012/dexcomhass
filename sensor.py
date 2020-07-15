@@ -14,7 +14,8 @@ from homeassistant.const import (
     CONF_SCAN_INTERVAL,
     CONF_CLIENT_ID,
     CONF_CLIENT_SECRET,
-    CONF_TOKEN
+    CONF_TOKEN,
+    CONF_PROFILE_NAME
 )
 from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle, slugify
@@ -38,9 +39,10 @@ SCAN_INTERVAL = timedelta(seconds=300)
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
+        vol.Required(CONF_PROFILE_NAME): cv.string,
         vol.Required(CONF_CLIENT_ID): cv.string,
         vol.Required(CONF_CLIENT_SECRET): cv.string,
-        vol.Required(CONF_TOKEN): cv.string
+        vol.Required(CONF_TOKEN): cv.string,
     }
 )
 
@@ -51,6 +53,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         client_id = config.get(CONF_CLIENT_ID)
         client_secret = config.get(CONF_CLIENT_SECRET)
         refresh = config.get(CONF_TOKEN)
+        name = config.get(CONF_PROFILE_NAME)
 
         # Get storage to see if we have a newer refresh token.
         store = get_store(hass, 1)
@@ -60,7 +63,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
         url = get_url(hass, require_ssl=True, allow_internal=False)
         _LOGGER.info("Starting Dexcom session")
-        _session = DexcomSession(url, client_id, client_secret, refresh)
+        _session = DexcomSession(name, url, client_id, client_secret, refresh)
         # first try to load tokens from storage
 
     except:
@@ -102,7 +105,7 @@ class BGSensor(Entity):
     @property
     def name(self):
         """Return the name of the sensor."""
-        return DOMAIN
+        return DOMAIN+"BG_"+self._session.get_name()
 
     @property
     def state(self):
