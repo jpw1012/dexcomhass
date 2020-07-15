@@ -100,7 +100,14 @@ class BGSensor(Entity):
         self._attributes = None
         self._state = None
         self._store = store
+        self._missing_data_count = 0
+        self._available = True
         self.async_update = Throttle(interval)(self._update)
+
+    @property
+    def available(self):
+        # Is the sensor available? Return false if marked unavailable or if missed data 4 times ina row (~20 minutes)
+        return self._available and self._missing_data_count < 4
 
     @property
     def name(self):
@@ -109,7 +116,7 @@ class BGSensor(Entity):
 
     @property
     def unique_id(self):
-        """Return the name of the sensor."""
+        """Return the unique name of the sensor."""
         return DOMAIN+"_BG-"+self._session.get_name()
 
     @property
@@ -135,7 +142,7 @@ class BGSensor(Entity):
             raise e
 
     async def _update(self):
-        from dexcomapi import ExpiredSessionException
+        from dexcomapi import ExpiredSessionException, NoBGDataException
         """Update device state."""
         _LOGGER.info("Updating Dexcom")
         retry_count = 0
@@ -146,6 +153,8 @@ class BGSensor(Entity):
                 do_retry = False
                 res = await self.try_update()
                 if res:
+                    self._missing_data_count = 0
+                    self._available = True
                     _LOGGER.info("Successfully refreshed data!")
 
             except ExpiredSessionException as ex:
@@ -155,10 +164,15 @@ class BGSensor(Entity):
                 retry_count += 1
                 res = await self.hass.async_add_executor_job(self._session.load_session)
                 self.hass.async_create_task(save_token(self._store, res))
+            except NoBGDataException as nd_ex:
+                # no data was found. Could be a bad signal or just a restarting cgm. Note it and move on.
+                # Mimicking the cgm behavior, a single missed entry does not mean an error
+                self._missing_data_count += 1
+
             except Exception as e:
                 _LOGGER.error("Error while updating data")
                 _LOGGER.error(e)
-                raise e
+                self._available = False
 
     @property
     def device_state_attributes(self):
@@ -169,3 +183,8 @@ class BGSensor(Entity):
     def icon(self):
         """Icon to use in the frontend."""
         return ICON
+
+    @property
+    def entity_picture(self):
+        """Entity picture from dexcom to use in the frontend."""
+        return "https://www.dexcom.com/sites/dexcom.com/files/menuimage/img-what_is_cgm_%402x.png"

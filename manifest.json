@@ -2,8 +2,9 @@
     "domain": "dexcom",
     "name": "Dexcom",
     "documentation": "https://pypi.org/project/dexcomapi/",
+    "config_flow": true,
     "requirements": [
-      "dexcomapi==0.3.0"
+      "dexcomapi==0.4.0"
     ],
     "dependencies": [],
     "codeowners": []
