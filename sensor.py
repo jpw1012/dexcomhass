@@ -122,8 +122,7 @@ class BGSensor(Entity):
             self._state = bg["smoothedValue"]
             return True
         except Exception as e:
-            _LOGGER.error("Error updating data")
-            _LOGGER.error(e)
+            _LOGGER.info("Failed to update data")
             raise e
 
     async def _update(self):
@@ -139,12 +138,14 @@ class BGSensor(Entity):
                 res = await self.try_update()
             except ExpiredSessionException as ex:
                 # Reload session and persist new token
-                _LOGGER.error("Session expired so refresh and retry: {}".format(self._session))
+                _LOGGER.info("Session expired so refresh and retry: {}".format(self._session))
                 do_retry = True
                 retry_count += 1
                 res = await self.hass.async_add_executor_job(self._session.load_session)
                 self.hass.async_create_task(save_token(self._store, res))
             except Exception as e:
+                _LOGGER.error("Error while updating data")
+                _LOGGER.error(e)
                 raise e
 
     @property
