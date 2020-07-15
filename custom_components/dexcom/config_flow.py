@@ -32,9 +32,9 @@ class DexcomConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="init", data_schema=vol.Schema(
                 {
-                    vol.Required(CONF_FRIENDLY_NAME): cv.string,
-                    vol.Required(CONF_CLIENT_ID): cv.string,
-                    vol.Required(CONF_CLIENT_SECRET): cv.string
+                    vol.Required(CONF_FRIENDLY_NAME): str,
+                    vol.Required(CONF_CLIENT_ID): str,
+                    vol.Required(CONF_CLIENT_SECRET): str
                 }
             )
         )
