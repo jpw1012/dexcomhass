@@ -16,7 +16,7 @@ from homeassistant.const import (
     CONF_CLIENT_ID,
     CONF_CLIENT_SECRET,
     CONF_TOKEN,
-    CONF_PROFILE_NAME
+    CONF_FRIENDLY_NAME
 )
 from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle, slugify
@@ -39,7 +39,7 @@ SCAN_INTERVAL = timedelta(seconds=300)
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
-        vol.Required(CONF_PROFILE_NAME): cv.string,
+        vol.Required(CONF_FRIENDLY_NAME): cv.string,
         vol.Required(CONF_CLIENT_ID): cv.string,
         vol.Required(CONF_CLIENT_SECRET): cv.string,
         vol.Required(CONF_TOKEN): cv.string
@@ -53,7 +53,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         client_id = config.get(CONF_CLIENT_ID)
         client_secret = config.get(CONF_CLIENT_SECRET)
         refresh = config.get(CONF_TOKEN)
-        name = config.get(CONF_PROFILE_NAME)
+        name = config.get(CONF_FRIENDLY_NAME)
 
         # Get storage to see if we have a newer refresh token.
         store = get_store(hass, 1)
