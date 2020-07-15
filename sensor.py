@@ -42,7 +42,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Required(CONF_PROFILE_NAME): cv.string,
         vol.Required(CONF_CLIENT_ID): cv.string,
         vol.Required(CONF_CLIENT_SECRET): cv.string,
-        vol.Required(CONF_TOKEN): cv.string,
+        vol.Required(CONF_TOKEN): cv.string
     }
 )
 
