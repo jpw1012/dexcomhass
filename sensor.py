@@ -11,6 +11,7 @@ import homeassistant.helpers.config_validation as cv
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.const import (
     ATTR_ATTRIBUTION,
+    ATTR_DATE,
     CONF_SCAN_INTERVAL,
     CONF_CLIENT_ID,
     CONF_CLIENT_SECRET,
@@ -19,7 +20,6 @@ from homeassistant.const import (
 )
 from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle, slugify
-from homeassistant.util.dt import now, parse_date
 from homeassistant.helpers.network import get_url
 from homeassistant.helpers.storage import Store
 
@@ -105,7 +105,12 @@ class BGSensor(Entity):
     @property
     def name(self):
         """Return the name of the sensor."""
-        return DOMAIN+"BG_"+self._session.get_name()
+        return self._session.get_name() + "_BG"
+
+    @property
+    def unique_id(self):
+        """Return the name of the sensor."""
+        return DOMAIN+"_BG-"+self._session.get_name()
 
     @property
     def state(self):
@@ -120,7 +125,8 @@ class BGSensor(Entity):
     async def try_update(self):
         try:
             bg = await self.hass.async_add_executor_job(self._session.load_current_bg)
-            self._attributes = {ATTR_ATTRIBUTION: DOMAIN}
+            self._attributes = {ATTR_ATTRIBUTION: DOMAIN,
+                                ATTR_DATE: bg["displayTime"] }
             self._attributes.update(bg)
             self._state = bg["smoothedValue"]
             return True
