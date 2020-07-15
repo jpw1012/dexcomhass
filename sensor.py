@@ -136,6 +136,9 @@ class BGSensor(Entity):
             try:
                 do_retry = False
                 res = await self.try_update()
+                if res:
+                    _LOGGER.info("Successfully refreshed data!")
+
             except ExpiredSessionException as ex:
                 # Reload session and persist new token
                 _LOGGER.info("Session expired so refresh and retry")
