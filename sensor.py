@@ -116,7 +116,7 @@ class BGSensor(Entity):
 
     async def try_update(self):
         try:
-            bg = await self.hass.async_add_executor_job(self._session.load_current_bg())
+            bg = await self.hass.async_add_executor_job(self._session.load_current_bg)
             self._attributes = {ATTR_ATTRIBUTION: DOMAIN}
             self._attributes.update(bg)
             self._state = bg["smoothedValue"]
@@ -127,7 +127,7 @@ class BGSensor(Entity):
             raise e
 
     async def _update(self):
-        from dexcomapi import DexcomSession, ExpiredSessionException
+        from dexcomapi import ExpiredSessionException
         """Update device state."""
         _LOGGER.info("Updating Dexcom")
         retry_count = 0
@@ -139,10 +139,10 @@ class BGSensor(Entity):
                 res = await self.try_update()
             except ExpiredSessionException as ex:
                 # Reload session and persist new token
-                _LOGGER.error("Session expired so refresh and retry")
+                _LOGGER.error("Session expired so refresh and retry: {}".format(self._session))
                 do_retry = True
                 retry_count += 1
-                res = await self.hass.async_add_executor_job(self._session.load_session())
+                res = await self.hass.async_add_executor_job(self._session.load_session)
                 self.hass.async_create_task(save_token(self._store, res))
             except Exception as e:
                 raise e
