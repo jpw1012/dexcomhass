@@ -15,7 +15,7 @@ from homeassistant.const import (
 )
 
 DOMAIN = "dexcom"
-URL_ROOT = "sandbox-api.dexcom.com"
+URL_ROOT = "https://sandbox-api.dexcom.com"
 
 _LOGGER = logging.getLogger(DOMAIN)
 
@@ -43,7 +43,7 @@ class DexcomConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is None:
             info = self.init_info
             return self.async_external_step(
-                step_id="user",
+                step_id="authorize",
                 url=f"{URL_ROOT}/v2/oauth2/login?client_id={info[CONF_CLIENT_ID]}&response_type=code&scope=offline_access&state={self.flow_id}&config_flow_id={self.flow_id}",
             )
         self.auth_info = user_input
