@@ -49,14 +49,14 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         client_secret = config.get(CONF_CLIENT_SECRET)
         refresh = config.get(CONF_TOKEN)
         name = config.get(CONF_FRIENDLY_NAME)
-        force_update = config.get(CONF_FORCE_UPDATE)
+        force_update = config.get(CONF_FORCE_UPDATE, None)
 
         # Get storage to see if we have a newer refresh token.
         store = get_store(hass, 1)
         token_data = await store.async_load()
-        if not force_update and token_data is not None and "refresh_token" in token_data:
+        if force_update is None and token_data is not None and "refresh_token" in token_data:
             refresh = token_data["refresh_token"]
-        elif force_update:
+        elif force_update is not None:
             _LOGGER.info("Force update was set so skipping stored token")
 
         url = get_url(hass, require_ssl=True, allow_internal=False)
