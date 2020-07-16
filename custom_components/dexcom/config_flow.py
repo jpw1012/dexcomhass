@@ -44,7 +44,7 @@ class DexcomConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             info = self.init_info
             return self.async_external_step(
                 step_id="authorize",
-                url=f"{URL_ROOT}/v2/oauth2/login?client_id={info[CONF_CLIENT_ID]}&response_type=code&scope=offline_access&state={self.flow_id}&config_flow_id={self.flow_id}",
+                url=f"{URL_ROOT}/v2/oauth2/login?client_id={info[CONF_CLIENT_ID]}&response_type=code&scope=offline_access&state={self.flow_id}&config_flow_id={self.flow_id}&redirect_uri=https://walshfamily.co:8123",
             )
         self.auth_info = user_input
         return self.async_external_step_done(next_step_id="finish")
