@@ -13,7 +13,8 @@ from homeassistant.const import (
     CONF_CLIENT_ID,
     CONF_CLIENT_SECRET,
     CONF_TOKEN,
-    CONF_FRIENDLY_NAME
+    CONF_FRIENDLY_NAME,
+    CONF_FORCE_UPDATE
 )
 from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle
@@ -35,7 +36,8 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Required(CONF_FRIENDLY_NAME): cv.string,
         vol.Required(CONF_CLIENT_ID): cv.string,
         vol.Required(CONF_CLIENT_SECRET): cv.string,
-        vol.Required(CONF_TOKEN): cv.string
+        vol.Required(CONF_TOKEN): cv.string,
+        vol.Optional(CONF_FORCE_UPDATE): cv.string
     }
 )
 
@@ -47,11 +49,12 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         client_secret = config.get(CONF_CLIENT_SECRET)
         refresh = config.get(CONF_TOKEN)
         name = config.get(CONF_FRIENDLY_NAME)
+        force_update = config.get(CONF_FORCE_UPDATE )
 
         # Get storage to see if we have a newer refresh token.
         store = get_store(hass, 1)
         token_data = await store.async_load()
-        if token_data is not None and "refresh_token" in token_data:
+        if force_update != "yes" and token_data is not None and "refresh_token" in token_data:
             refresh = token_data["refresh_token"]
 
         url = get_url(hass, require_ssl=True, allow_internal=False)
