@@ -15,7 +15,7 @@ from homeassistant.const import (
 )
 
 DOMAIN = "dexcom"
-URL_ROOT = "https://sandbox-api.dexcom.com"
+URL_ROOT = "https://api.dexcom.com"
 
 _LOGGER = logging.getLogger(DOMAIN)
 

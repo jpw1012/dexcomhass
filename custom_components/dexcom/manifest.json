@@ -5,7 +5,7 @@
     "issue_tracker": "https://github.com/jpw1012/dexcomhass/issues",
     "config_flow": false,
     "requirements": [
-      "dexcomapi==0.4.0"
+      "dexcomapi==0.4.1"
     ],
     "dependencies": [],
     "codeowners": []
