@@ -49,7 +49,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         client_secret = config.get(CONF_CLIENT_SECRET)
         refresh = config.get(CONF_TOKEN)
         name = config.get(CONF_FRIENDLY_NAME)
-        force_update = config.get(CONF_FORCE_UPDATE )
+        force_update = config.get(CONF_FORCE_UPDATE)
 
         # Get storage to see if we have a newer refresh token.
         store = get_store(hass, 1)
@@ -60,7 +60,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
             _LOGGER.info("Force update was set so skipping stored token")
 
         url = get_url(hass, require_ssl=True, allow_internal=False)
-        _LOGGER.info("Starting Dexcom session")
+        _LOGGER.info(f"Starting Dexcom session. Force  update: {force_update}")
         _session = DexcomSession(name, url, client_id, client_secret, refresh)
         # first try to load tokens from storage
 
