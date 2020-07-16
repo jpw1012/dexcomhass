@@ -176,8 +176,3 @@ class BGSensor(Entity):
     def icon(self):
         """Icon to use in the frontend."""
         return ICON
-
-    @property
-    def entity_picture(self):
-        """Entity picture from dexcom to use in the frontend."""
-        return "https://www.dexcom.com/sites/dexcom.com/files/menuimage/img-what_is_cgm_%402x.png"
